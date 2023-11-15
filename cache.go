@@ -46,8 +46,8 @@ func SetFallback(fallback Fallback) {
 	cache.Fallback = fallback
 }
 
-func Icon(name string) templ.Component {
-	return cache.Icon(name, nil)
+func Icon(name string, p *Parameters) templ.Component {
+	return cache.Icon(name, p)
 }
 
 func (c *Cache) Icon(name string, p *Parameters) templ.Component {
@@ -75,7 +75,7 @@ func (c *Cache) Icon(name string, p *Parameters) templ.Component {
 }
 
 func IconWithFallback(name string, fallback string, p *Parameters) templ.Component {
-	return cache.IconWithFallback(name, fallback, nil)
+	return cache.IconWithFallback(name, fallback, p)
 }
 
 func (c *Cache) IconWithFallback(name string, fallback string, p *Parameters) templ.Component {
