@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestCacheWithNoFallback(t *testing.T) {
+func TestCacheWithoutFallback(t *testing.T) {
 	api := "https://api.iconify.design"
 	icon := "mdi:home"
 
@@ -57,8 +57,9 @@ func TestCacheWithFallback(t *testing.T) {
 		t.Fatalf("Expected <span>Home</span>, got %s", result)
 	}
 
-	log := <-cache.Logs
-	if log != "Cached: https://api.iconify.design/mdi/home" {
-		t.Fatalf("Expected 'Cached: https://api.iconify.design/mdi/home', got %s", log)
+	cache.wg.Wait()
+	url := "https://api.iconify.design/mdi/home"
+	if cache.cache[url] == nil {
+		t.Fatalf("Expected %s in cache, got nil", url)
 	}
 }

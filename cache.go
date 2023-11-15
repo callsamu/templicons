@@ -10,19 +10,19 @@ import (
 
 
 type Cache struct {
-	Logs     chan string
 	Errors   chan error
-	API      string
 
 	cache   map[string][]byte
 	mutex   sync.Mutex
-	client  Client
+	wg      sync.WaitGroup
+
+	API      string
+	client   Client
 }
 
 func NewCache(api string, client Client) *Cache {
 	return &Cache{
 		Errors: make(chan error),
-		Logs:   make(chan string),
 		API:    api,
 		cache:  make(map[string][]byte),
 		client: client,
@@ -59,7 +59,7 @@ func (c *Cache) Icon(name string, p *Parameters) templ.Component {
 			return err
 		}
 
-		_, err = w.Write(svg)
+		_, err = w.Write(svg) 
 		return err
 	})
 }
@@ -81,7 +81,11 @@ func (c *Cache) IconWithFallback(name string, fallback string, p *Parameters) te
 			return err
 		}
 
-		go c.fetchAndSave(url)
+		c.wg.Add(1)
+		go func() {
+			defer c.wg.Done()
+			c.fetchAndSave(url)
+		}()
 
 		html := "<span>" + fallback + "</span>"
 		_, err := w.Write([]byte(html))
@@ -99,7 +103,5 @@ func (c *Cache) fetchAndSave(url string) ([]byte, error) {
 	defer c.mutex.Unlock()
 
 	c.cache[url] = svg
-	c.Logs <- "Cached: " + url
-
 	return svg, nil
 }
