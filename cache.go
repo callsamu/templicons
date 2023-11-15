@@ -18,14 +18,16 @@ type Cache struct {
 
 	API      string
 	client   Client
+	Fallback Fallback
 }
 
-func NewCache(api string, client Client) *Cache {
+func NewCache(api string, client Client, fallback Fallback) *Cache {
 	return &Cache{
-		Errors: make(chan error),
-		API:    api,
-		cache:  make(map[string][]byte),
-		client: client,
+		Errors:   make(chan error),
+		API:      api,
+		cache:    make(map[string][]byte),
+		client:   client,
+		Fallback: fallback,
 	}
 }
 
@@ -33,7 +35,15 @@ var cache *Cache
 
 func init() {
 	client := NewIconifyClient()
-	cache = NewCache("https://api.iconify.design", client)
+	cache = NewCache("https://api.iconify.design", client, DefaultFallback)
+}
+
+func SetInstance(url string) {
+	cache.API = url
+}
+
+func SetFallback(fallback Fallback) {
+	cache.Fallback = fallback
 }
 
 func Icon(name string) templ.Component {

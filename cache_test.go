@@ -11,7 +11,7 @@ func TestCacheWithoutFallback(t *testing.T) {
 	icon := "mdi:home"
 
 	client := MockClient{}
-	cache := NewCache(api, client)
+	cache := NewCache(api, client, DefaultFallback)
 
 	c := cache.Icon(icon, nil)
 
@@ -42,7 +42,7 @@ func TestCacheWithFallback(t *testing.T) {
 	icon := "mdi:home"
 
 	client := MockClient{}
-	cache := NewCache(api, client)
+	cache := NewCache(api, client, DefaultFallback)
 
 	c := cache.IconWithFallback(icon, "Home", nil)
 
