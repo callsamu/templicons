@@ -3,7 +3,6 @@ package templicons
 import (
 	"context"
 	"io"
-	"strings"
 	"sync"
 
 	"github.com/a-h/templ"
@@ -11,23 +10,22 @@ import (
 
 
 type Cache struct {
+	Logs     chan string
 	Errors   chan error
 	API      string
 
 	cache   map[string][]byte
 	mutex   sync.Mutex
 	client  Client
-
-	AllowFallback bool
 }
 
-func NewCache(api string, allowFallback bool, client Client) *Cache {
+func NewCache(api string, client Client) *Cache {
 	return &Cache{
-		Errors:        make(chan error),
-		API:           api,
-		cache:         make(map[string][]byte),
-		client:        client,
-		AllowFallback: allowFallback,
+		Errors: make(chan error),
+		Logs:   make(chan string),
+		API:    api,
+		cache:  make(map[string][]byte),
+		client: client,
 	}
 }
 
@@ -35,7 +33,7 @@ var cache *Cache
 
 func init() {
 	client := NewIconifyClient()
-	cache = NewCache("https://api.iconify.design", false, client)
+	cache = NewCache("https://api.iconify.design", client)
 }
 
 func Icon(name string) templ.Component {
@@ -43,22 +41,7 @@ func Icon(name string) templ.Component {
 }
 
 func (c *Cache) Icon(name string, p *Parameters) templ.Component {
-	return c.IconWithFallback(name, "", p)
-}
-
-func IconWithFallback(name string, fallback string) templ.Component {
-	return cache.IconWithFallback(name, fallback, nil)
-}
-
-func (c *Cache) IconWithFallback(name string, fallback string, p *Parameters) templ.Component {
-	parsed := strings.Split(name, ":")
-	if len(parsed) != 2 {
-		panic("invalid icon name")
-	}
-
-	set := parsed[0]
-	icon := parsed[1]
-
+	set, icon := parseName(name)
 	url := iconURL(c.API, set, icon, p)
 
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
@@ -71,17 +54,38 @@ func (c *Cache) IconWithFallback(name string, fallback string, p *Parameters) te
 		}
 		c.mutex.Unlock()
 
-		if !c.AllowFallback {
-			svg, err := c.fetchAndSave(url)
-			if err != nil {
-				return err
-			}
-
-			_, err = w.Write(svg)
+		svg, err := c.fetchAndSave(url)
+		if err != nil {
 			return err
 		}
 
-		return nil
+		_, err = w.Write(svg)
+		return err
+	})
+}
+
+func IconWithFallback(name string, fallback string, p *Parameters) templ.Component {
+	return cache.IconWithFallback(name, fallback, nil)
+}
+
+func (c *Cache) IconWithFallback(name string, fallback string, p *Parameters) templ.Component {
+	set, icon := parseName(name)
+	url := iconURL(c.API, set, icon, p)
+
+	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
+		c.mutex.Lock()
+		defer c.mutex.Unlock()
+
+		if cached, ok := c.cache[url]; ok {
+			_, err := w.Write(cached)
+			return err
+		}
+
+		go c.fetchAndSave(url)
+
+		html := "<span>" + fallback + "</span>"
+		_, err := w.Write([]byte(html))
+		return err
 	})
 }
 
@@ -95,5 +99,7 @@ func (c *Cache) fetchAndSave(url string) ([]byte, error) {
 	defer c.mutex.Unlock()
 
 	c.cache[url] = svg
+	c.Logs <- "Cached: " + url
+
 	return svg, nil
 }
