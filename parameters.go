@@ -20,7 +20,7 @@ func (p *Parameters) SetColor(color string) {
 	p.Color = color
 }
 
-func (ip *Parameters) AsQueryString() string  {
+func (ip *Parameters) asQueryString() string  {
 	q := url.Values{}
 
 	if ip.Width > 0 {
