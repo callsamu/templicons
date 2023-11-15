@@ -2,9 +2,13 @@ package templicons
 
 import "errors"
 
-type MockClient struct {}
+type MockClient struct {
+	calls int
+}
 
 func (c MockClient) Fetch(url string) ([]byte, error) {
+	c.calls++
+
 	if url != "" {
 		response := []byte("<svg></svg>")
 		return response, nil

@@ -35,6 +35,21 @@ func TestCacheWithoutFallback(t *testing.T) {
 	if string(svg) != "<svg></svg>" {
 		t.Fatalf("Expected <svg></svg>, got %s", string(svg))
 	}
+
+	var buffer2 bytes.Buffer
+	err = c.Render(context.Background(), &buffer2)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	result2 := buffer2.String()
+	if result2 != "<svg></svg>" {
+		t.Fatalf("Expected <svg></svg>, got %s", result2)
+	}
+
+	if client.calls > 1 {
+		t.Fatalf("Expected a single client fetch call, got %d", client.calls)
+	}
 }
 
 func TestCacheWithFallback(t *testing.T) {
@@ -61,5 +76,20 @@ func TestCacheWithFallback(t *testing.T) {
 	url := "https://api.iconify.design/mdi/home"
 	if cache.cache[url] == nil {
 		t.Fatalf("Expected %s in cache, got nil", url)
+	}
+
+	var buffer2 bytes.Buffer
+	err = c.Render(context.Background(), &buffer2)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	result2 := buffer2.String()
+	if result2 != "<svg></svg>" {
+		t.Fatalf("Expected <svg></svg>, got %s", result2)
+	}
+
+	if client.calls > 1 {
+		t.Fatalf("Expected a single client fetch call, got %d", client.calls)
 	}
 }
