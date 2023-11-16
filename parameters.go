@@ -11,13 +11,16 @@ type Parameters struct {
 	Color  string
 }
 
-func (p *Parameters) SetDimensions(width, height int) {
+func (p *Parameters) SetDimensions(width, height int) *Parameters {
 	p.Width = width
 	p.Height = height
+
+	return p
 }
 
-func (p *Parameters) SetColor(color string) {
+func (p *Parameters) SetColor(color string) *Parameters {
 	p.Color = color
+	return p
 }
 
 func (ip *Parameters) asQueryString() string  {
