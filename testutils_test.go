@@ -6,6 +6,8 @@ type MockClient struct {
 	calls int
 }
 
+func (c MockClient) SetInstances(instances ...string) {}
+
 func (c MockClient) Fetch(url string) ([]byte, error) {
 	c.calls++
 

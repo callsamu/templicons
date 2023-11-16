@@ -62,12 +62,12 @@ func main() {
     // The Iconify Instance You Would Like to Use
     instance := "https://api.iconify.design"
     // The Client
-    client := templicons.NewIconifyClient()
+    client := templicons.NewIconifyClient(instance)
     // The Fallback Component (we will come back to this later)
     fallback := templicons.DefaultFallback
 
     // Your cache instance
-    cache := templicons.NewCache(api, client, fallback)
+    cache := templicons.NewCache(client, fallback)
 
     component := FooComponent(cache)
     err := component.Render(context.Background(), os.Stdout)

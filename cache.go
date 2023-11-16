@@ -16,15 +16,13 @@ type Cache struct {
 	mutex   sync.Mutex
 	wg      sync.WaitGroup
 
-	API      string
 	client   Client
 	Fallback Fallback
 }
 
-func NewCache(api string, client Client, fallback Fallback) *Cache {
+func NewCache(client Client, fallback Fallback) *Cache {
 	return &Cache{
 		Errors:   make(chan error),
-		API:      api,
 		cache:    make(map[string][]byte),
 		client:   client,
 		Fallback: fallback,
@@ -34,16 +32,16 @@ func NewCache(api string, client Client, fallback Fallback) *Cache {
 var cache *Cache
 
 func init() {
-	client := NewIconifyClient()
-	cache = NewCache("https://api.iconify.design", client, DefaultFallback)
+	client := NewIconifyClient("https://api.iconify.design")
+	cache = NewCache(client, DefaultFallback)
 }
 
 func Errors() chan error {
 	return cache.Errors
 }
 
-func SetInstance(url string) {
-	cache.API = url
+func SetInstances(urls ...string) {
+	cache.client.SetInstances(urls...)
 }
 
 func SetFallback(fallback Fallback) {
@@ -56,7 +54,7 @@ func Icon(name string, p *Parameters) templ.Component {
 
 func (c *Cache) Icon(name string, p *Parameters) templ.Component {
 	set, icon := parseName(name)
-	url := iconURL(c.API, set, icon, p)
+	url := iconPath(set, icon, p)
 
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		c.mutex.Lock()
@@ -84,7 +82,7 @@ func IconWithFallback(name string, fallback string, p *Parameters) templ.Compone
 
 func (c *Cache) IconWithFallback(name string, fallback string, p *Parameters) templ.Component {
 	set, icon := parseName(name)
-	url := iconURL(c.API, set, icon, p)
+	url := iconPath(set, icon, p)
 
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		c.mutex.Lock()

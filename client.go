@@ -6,19 +6,31 @@ import (
 )
 
 type Client interface {
-	Fetch(url string) ([]byte, error)
+	Fetch(path string) ([]byte, error)
+	SetInstances(instances ...string)
 }
 
 type IconifyClient struct {
 	*http.Client
+
+	Instances []string
 }
 
-func NewIconifyClient() *IconifyClient {
-	return &IconifyClient{&http.Client{}}
+func NewIconifyClient(instances ...string) *IconifyClient {
+	return &IconifyClient{
+		Client: &http.Client{},
+		Instances: instances,
+	}
 }
 
-func (c IconifyClient) Fetch(url string) ([]byte, error) {
-	resp, err := c.Get(url)
+func (c *IconifyClient) SetInstances(instances ...string) {
+	c.Instances = instances
+}
+
+func (c IconifyClient) Fetch(path string) ([]byte, error) {
+	instance := c.Instances[0]
+
+	resp, err := c.Get(instance + path)
 	if err != nil {
 		return nil, err
 	}
