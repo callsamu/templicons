@@ -1,9 +1,9 @@
 # Templicons
 
 This package implements Icon components for the [Templ](https://github.com/tempojs/tempo)
-templating language by using the Iconify API. It is pretty similar to the Iconify React,
-Vue, and other frameworks components, except that icons are cached, which means that your
-application makes only one request per icon.
+templating language by using the Iconify API, which are pretty similar to the Iconify React,
+Vue, and other frameworks components, except that retrieved icons are cached on your Go application, 
+which means that only one request per icon is needed and no javascript is required.
 
 ## Usage
 
