@@ -21,9 +21,9 @@ templ FooComponent() {
     <!-- A Simple Home Icon -->
     @i.Icon("mdi:home", nil)
     <!-- The Same Icon, But With Width and Height Set -->
-    @i.Icon("mdi:home", &i.Parameters{}.SetDimensions(20, 20))
+    @i.Icon("mdi:home", i.Params().SetDimensions(20, 20))
     <!-- The Same Icon, But With Color Set to Blue -->
-    @i.Icon("mdi:home", &i.Parameters{}.SetColor("#FF0000"))
+    @i.Icon("mdi:home", i.Params().SetColor("#FF0000"))
     <!-- Or Just Ignore Any Setters -->
     @i.Icon("mdi:home", &i.Parameters{Width: 20, Height: 20, Color: "#FF0000"})
 }

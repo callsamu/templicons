@@ -11,6 +11,10 @@ type Parameters struct {
 	Color  string
 }
 
+func Params() *Parameters {
+	return &Parameters{}
+}
+
 func (p *Parameters) SetDimensions(width, height int) *Parameters {
 	p.Width = width
 	p.Height = height
