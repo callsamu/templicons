@@ -26,7 +26,7 @@ func TestCacheWithoutFallback(t *testing.T) {
 		t.Fatalf("Expected <svg></svg>, got %s", result)
 	}
 
-	url := "https://api.iconify.design/mdi/home"
+	url := "https://api.iconify.design/mdi/home.svg"
 	svg, ok := cache.cache[url]
 	if !ok {
 		t.Fatalf("Expected %s in cache, got nil", url)
@@ -73,7 +73,7 @@ func TestCacheWithFallback(t *testing.T) {
 	}
 
 	cache.wg.Wait()
-	url := "https://api.iconify.design/mdi/home"
+	url := "https://api.iconify.design/mdi/home.svg"
 	if cache.cache[url] == nil {
 		t.Fatalf("Expected %s in cache, got nil", url)
 	}

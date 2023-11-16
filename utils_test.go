@@ -20,14 +20,14 @@ func TestIconURL(t *testing.T) {
 			set:      "mdi",
 			name:     "home",
 			params:   nil,
-			expected: "https://api.iconify.design/mdi/home",
+			expected: "https://api.iconify.design/mdi/home.svg",
 		},
 		{
 			api:      api,
 			set:      "mdi",
 			name:     "home",
 			params:   &Parameters{Color: "red"},
-			expected: "https://api.iconify.design/mdi/home?color=red",
+			expected: "https://api.iconify.design/mdi/home.svg?color=red",
 		},
 	}
 

@@ -3,7 +3,7 @@ package templicons
 import "strings"
 
 func iconURL(api string, set, name string, p *Parameters) string {
-	url := api + "/" + set + "/" + name
+	url := api + "/" + set + "/" + name + ".svg"
 	if p != nil {
 		url += "?" + p.asQueryString()
 	}
