@@ -38,6 +38,10 @@ func init() {
 	cache = NewCache("https://api.iconify.design", client, DefaultFallback)
 }
 
+func Errors() chan error {
+	return cache.Errors
+}
+
 func SetInstance(url string) {
 	cache.API = url
 }
